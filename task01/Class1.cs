@@ -30,3 +30,4 @@ public static class StringExtensions
         return new_input == reversed;
     }
 }
+
