@@ -1,9 +1,9 @@
 ﻿namespace task02;
 public class Student
 {
-    public string Name { get; set; }
-    public string Faculty { get; set; }
-    public List<int> Grades { get; set; }
+    public required string Name { get; set; }
+    public required string Faculty { get; set; }
+    public required List<int> Grades { get; set; }
 }
 public class StudentService
 {
@@ -22,5 +22,5 @@ public class StudentService
         => _students.ToLookup(d => d.Faculty);
 
     public string GetFacultyWithHighestAverageGrade()
-        => _students.GroupBy(e => e.Faculty).MaxBy(f => f.Average(g => g.Grades.Average())).Key;
+        => _students.GroupBy(e => e.Faculty).MaxBy(f => f.Average(g => g.Grades.Average()))!.Key;
 }
