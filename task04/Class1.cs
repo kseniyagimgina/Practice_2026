@@ -45,7 +45,7 @@ public class Cruiser: ISpaceship
     }    
     public int Speed {get;} = 50;
     public int FirePower {get;} = 100;
-    public int Coordinate {get; set;} = 0;
-    public int Angle {get; set;} = 0;
-    public int Shoot {get; set;} = 0;
+    public int Coordinate {get; private set;} = 0;
+    public int Angle {get; private set;} = 0;
+    public int Shoot {get; private set;} = 0;
 }
