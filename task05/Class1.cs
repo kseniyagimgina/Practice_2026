@@ -17,7 +17,13 @@ public class ClassAnalyzer
     }
     public IEnumerable<string> GetMethodParams(string methodname)
     {
-        
+        var public_method = _type.GetMethod(methodname, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
+        if (public_method == null)
+        {
+            return Enumerable.Empty<string>();
+        }
+    
+        return new [] {public_method.ReturnType.Name}.Concat(public_method.GetParameters().Select(a => a.Name!));
     }
     public IEnumerable<string> GetAllFields()
     {
@@ -29,6 +35,6 @@ public class ClassAnalyzer
     }
     public bool HasAttribute<T>() where T : Attribute
     {
-        
+        return _type.GetCustomAttributes(typeof(T), false).Any();
     }
 }
