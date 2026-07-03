@@ -45,7 +45,7 @@ public class Console_Test
     }
 
     [Fact]
-    public void GetAttributesFromDirectorySizeCommandWithParameters()
+    public void GetAttributesFromDirectorySizeCommand()
     {
         Type type = typeof(DirectorySizeCommand);
         var displayNameAttr = type.GetCustomAttribute<DisplayNameAttribute>();
