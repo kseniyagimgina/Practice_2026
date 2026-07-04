@@ -4,10 +4,10 @@
     <ProjectReference Include="..\CommandLib\CommandLib.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\FileSystemCommands\bin\$(Configuration)\$(TargetFramework)\FileSystemCommands.dll" 
-          CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if exist &quot;$(ProjectDir)..\FileSystemCommands\bin\$(Configuration)\$(TargetFramework)\FileSystemCommands.dll&quot; copy /Y &quot;$(ProjectDir)..\FileSystemCommands\bin\$(Configuration)\$(TargetFramework)\FileSystemCommands.dll&quot; &quot;$(TargetDir)&quot;" Condition="'$(OS)' == 'Windows_NT'" />
+    <Exec Command="if [ -f &quot;$(ProjectDir)../FileSystemCommands/bin/$(Configuration)/$(TargetFramework)/FileSystemCommands.dll&quot; ]; then cp &quot;$(ProjectDir)../FileSystemCommands/bin/$(Configuration)/$(TargetFramework)/FileSystemCommands.dll&quot; &quot;$(TargetDir)&quot;; fi" Condition="'$(OS)' != 'Windows_NT'" />
+  </Target>
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
