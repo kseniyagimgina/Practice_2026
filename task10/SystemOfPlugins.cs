@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Microsoft.VisualBasic;
 
 namespace task10;
 
@@ -18,10 +19,24 @@ public class PluginLib
         public List<Type> Plugins {get;} = [];
         public void LoadFromDirectory(string filepath)
         {
+            if (!Directory.Exists(filepath))
+            {
+                throw new DirectoryNotFoundException($"Директории {filepath} нет");
+            }
+
             foreach (var file in Directory.GetFiles(filepath, "*.dll"))
             {
-                var types = Assembly.LoadFrom(file).GetTypes().Where(a => a.GetCustomAttribute<PluginLoadAttribute>() != null && typeof(IPlugin).IsAssignableFrom(a) && !a.IsAbstract);
-                    Plugins.AddRange(types);
+                Assembly assembly;
+                try
+                {
+                    assembly = Assembly.LoadFrom(file);
+                }
+                catch (Exception exception)
+                {
+                    throw new InvalidOperationException($"Ошибка {exception.GetType().Name}: {exception.Message}", exception);
+                }
+                var types = assembly.GetTypes().Where(a => a.GetCustomAttribute<PluginLoadAttribute>() != null && typeof(IPlugin).IsAssignableFrom(a) && !a.IsAbstract);
+                Plugins.AddRange(types);
             }
         }
         public void ExecutePlugin()
