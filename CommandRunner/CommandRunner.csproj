@@ -5,9 +5,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\FileSystemCommands\bin\$(Configuration)\$(TargetFramework)\FileSystemCommands.dll" 
-          CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
+    <None Include="..\FileSystemCommands\bin\$(Configuration)\$(TargetFramework)\FileSystemCommands.dll">
+        <Link>FileSystemCommands.dll</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+</ItemGroup>
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
