@@ -9,7 +9,15 @@ public class Program
         {
             return;
         }
-        Assembly MetaData = Assembly.LoadFrom(args[0]);
+        Assembly MetaData;
+         try
+        {
+            MetaData = Assembly.LoadFrom(args[0]);
+        }
+        catch (Exception exception)
+        {
+            throw new InvalidOperationException($"Ошибка {exception.GetType().Name}: {exception.Message}", exception);
+        }
         Console.WriteLine($"Библиотека: {MetaData.GetName().Name}");
         Type[] Types = MetaData.GetTypes();
         foreach (Type type in Types)
