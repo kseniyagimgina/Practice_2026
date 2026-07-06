@@ -39,6 +39,6 @@ public class ClassAnalyzer
     }
     public bool HasAttribute<T>() where T : Attribute
     {
-        return _type.GetCustomAttributes(typeof(T), false).Any();
+        return _type.IsDefined(typeof(T), inherit: true);
     }
 }
