@@ -8,7 +8,14 @@ namespace CommandRunner
             string Dir = AppDomain.CurrentDomain.BaseDirectory;
             string FilePath = Path.Combine(Dir, "FileSystemCommands.dll");
             Assembly assembly = Assembly.LoadFrom(FilePath);
-
+            try
+            {
+                Assembly assembly = Assembly.LoadFrom(FilePath);
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidOperationException($"Ошибка {exception.GetType().Name}: {exception.Message}", exception);
+            }
             string dir = Path.Combine(Path.GetTempPath(), "Dir");
             Directory.CreateDirectory(dir);
             File.WriteAllText(Path.Combine(dir, "file1.txt"), "Hello World");
