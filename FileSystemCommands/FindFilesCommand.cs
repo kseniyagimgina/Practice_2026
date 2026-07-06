@@ -1,5 +1,9 @@
-﻿namespace FileSystemCommands;
+﻿using task07;
+using CommandLib;
+namespace FileSystemCommands;
 
+[DisplayName("Нахождение файлов по маске")]
+[Version(1,0)]
 public class FindFilesCommand: ICommand
 {
     public string Filepath {get;}

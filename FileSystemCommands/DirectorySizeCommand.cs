@@ -1,5 +1,9 @@
-﻿namespace FileSystemCommands;
+﻿using task07;
+using CommandLib;
+namespace FileSystemCommands;
 
+[DisplayName("Определение размера каталога")]
+[Version(1,0)]
 public class DirectorySizeCommand: ICommand
 {
     public string Filepath {get;}

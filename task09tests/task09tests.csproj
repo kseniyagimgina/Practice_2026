@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\task09\task09.csproj" />
-    <ProjectReference Include="..\FileSystemCommands\FileSystemCommands.csproj" />>
+    <ProjectReference Include="..\FileSystemCommands\FileSystemCommands.csproj" />
   </ItemGroup>
 
 </Project>
