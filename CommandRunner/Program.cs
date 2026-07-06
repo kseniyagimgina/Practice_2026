@@ -7,10 +7,10 @@ namespace CommandRunner
         {
             string Dir = AppDomain.CurrentDomain.BaseDirectory;
             string FilePath = Path.Combine(Dir, "FileSystemCommands.dll");
-            Assembly assembly = Assembly.LoadFrom(FilePath);
+            Assembly assembly;
             try
             {
-                Assembly assembly = Assembly.LoadFrom(FilePath);
+                assembly = Assembly.LoadFrom(FilePath);
             }
             catch (Exception exception)
             {
