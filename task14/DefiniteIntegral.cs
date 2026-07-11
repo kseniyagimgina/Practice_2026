@@ -18,19 +18,19 @@ public class DefiniteIntegral
             (a, b) = (b, a);
             ReversedInterval = true;
         }
-        double sum = 0.0;
-        Barrier barrier = new Barrier(threadsnumber + 1);
+        double[] localResults = new double[threadsnumber];  
+        Task[] tasks = new Task[threadsnumber]; 
         double lengthsegment = b - a;
         if (lengthsegment == 0)
         {
             return 0.0;
         } 
         double sublengthsegment = lengthsegment / threadsnumber;
-        Thread[] threads = new Thread[threadsnumber];
+
         for (int i = 0; i < threadsnumber; i++)
         {
             int threadIndex = i;
-            threads[i] = new Thread(() =>
+            tasks[i] = Task.Run(() =>
             {
                 double A = a + threadIndex * sublengthsegment;
                 double B = A + sublengthsegment;
@@ -43,26 +43,22 @@ public class DefiniteIntegral
                     localSum += function(x);
                 }
                 localSum = localSum * h;
-                double initial, calculated;
-                do
-                {
-                    initial = sum;              
-                    calculated = initial + localSum; 
-                }
-                while (Interlocked.CompareExchange(ref sum, calculated, initial) != initial);
-                barrier.SignalAndWait();
-            });
-            threads[i].Start();
+                localResults[threadIndex] = localSum;
+            });  
         }
-        barrier.SignalAndWait();
-        if (ReversedInterval)
+        Task.WaitAll(tasks);
+        double sum = 0;
+        for (int i = 0; i < threadsnumber; i++)
         {
-            return -sum;
+            sum += localResults[i];
         }
-        else
-        {
-            return sum;
-        }
-        
+         if (ReversedInterval)
+            {
+                return -sum;
+            }
+            else
+            {
+                return sum;
+            }
     }
 }
