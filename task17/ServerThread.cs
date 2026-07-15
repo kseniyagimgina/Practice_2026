@@ -7,16 +7,16 @@ public class ServerThread
     private Thread thread;
     private bool hardstop;
     private bool softstop;
-    private readonly Action<Exception, ICommand> _error;
+    private readonly Action<Exception, ICommand> ExceptionHandler;
     public ServerThread(Action<Exception, ICommand>? error = null)
     {
         if (error != null)
         {
-            _error = error;
+            ExceptionHandler = error;
         }
         else
         {
-            _error = (ex, cmd) => { };
+            ExceptionHandler = (exception, command) => { };
         }
     }
     public void Start()
@@ -60,9 +60,9 @@ public class ServerThread
                 {
                     command.Execute();
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    _error(ex, command);
+                    ExceptionHandler(exception, command);
                 }
             }
         }
