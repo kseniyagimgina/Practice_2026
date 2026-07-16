@@ -1,15 +1,31 @@
+using System.Collections.Concurrent;
+
 namespace task17;
 
 public class ServerThread
 {
-    private readonly Queue<ICommand> queue = new Queue<ICommand>();
-    private readonly object locked = new object();
-    private Thread thread;
-    private bool hardstop;
-    private bool softstop;
-    private readonly Action<Exception, ICommand> ExceptionHandler;
-    public ServerThread(Action<Exception, ICommand>? error = null)
+    private readonly BlockingCollection<ICommand> Queue = new BlockingCollection<ICommand>();
+    private readonly IScheduler Scheduler;
+    private Thread? thread;
+    private volatile bool hardstop;
+    private volatile bool softstop;
+    private readonly Action<Exception, ICommand?> ExceptionHandler;
+    private const int WaitTimeOut = 10;
+    public ServerThread(IScheduler scheduler, Action<Exception, ICommand?>? error = null)
     {
+        if (scheduler != null)
+        {
+            ExceptionHandler = error;
+        }
+        else
+        {
+            ExceptionHandler = (exception, command) => { };
+        }
+        if (scheduler == null)
+        {
+            throw new ArgumentNullException(nameof(scheduler));
+        }
+        Scheduler = scheduler;
         if (error != null)
         {
             ExceptionHandler = error;
@@ -21,68 +37,67 @@ public class ServerThread
     }
     public void Start()
     {
-        thread = new Thread(Work);
+        thread = new Thread(Work)
+        {
+            IsBackground = true,
+            Name = "ServerThread"
+        };
         thread.Start();
     }
     public void Enqueue(ICommand command)
     {
-        lock (queue)
+        if (!Queue.IsAddingCompleted)
         {
-            queue.Enqueue(command);
-            Monitor.Pulse(queue);
+            Queue.Add(command);
         }
     }
     private void Work()
     {
         while (true)
         {
-            ICommand? command = null;
-
-            lock (queue)
+            ICommand? newcommand = null;
+            bool getcommand = false;
+            try
             {
-                while (queue.Count == 0 && !hardstop && !softstop)
-                {
-                    Monitor.Wait(queue);
-                }
-
-                if (hardstop)
-                    break;
-
-                if (softstop && queue.Count == 0)
-                    break;
-
-                if (queue.Count > 0)
-                    command = queue.Dequeue();
+                getcommand = Queue.TryTake(out newcommand, WaitTimeOut);
             }
-            if (command != null)
+            catch (InvalidOperationException)
             {
-                try
+                break;
+            }
+            if (getcommand && newcommand != null)
+            {
+                Scheduler.Add(newcommand);
+            }
+            if (hardstop)
+                break;
+            if (softstop && !Scheduler.HasCommand() && Queue.Count == 0)
+                break;
+            if (Scheduler.HasCommand())
+            {
+                var command_execute = Scheduler.Select();
+                if (command_execute != null)
                 {
-                    command.Execute();
-                }
-                catch (Exception exception)
-                {
-                    ExceptionHandler(exception, command);
+                    try
+                    {
+                        command_execute.Execute();
+                    }
+                    catch (Exception exception)
+                    {
+                        ExceptionHandler(exception, command_execute);
+                    }
                 }
             }
-        }
-    }
-    public void HardStopInternal()
-    {
-        lock (queue)
-        {
-            queue.Clear();
-            hardstop = true;
-            Monitor.Pulse(queue);
         }
     }
     public void SoftStopInternal()
     {
-        lock (queue)
-        {
-            softstop = true;
-            Monitor.Pulse(queue);
-        }
+        softstop = true;
+    }
+    public void HardStopInternal()
+    {
+        hardstop = true;
+        Queue.CompleteAdding();
     }
     public Thread GetThread()
     {

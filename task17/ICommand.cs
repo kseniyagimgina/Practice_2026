@@ -2,5 +2,7 @@
 
 public interface ICommand
 {
-    void Execute();
+    bool Execute();
+    bool IsCompleted { get; }
+    string Name { get; }
 }
