@@ -68,7 +68,7 @@ public class Task19CombinedTest
             sig.MarkerShape = MarkerShape.FilledCircle;
             sig.LegendText = $"Команда {i}";
         }
-        plt.Title("Dыполнение 5 экземпляров TestCommand 3 раза", 16);
+        plt.Title("Выполнение 5 экземпляров TestCommand 3 раза", 16);
         plt.XLabel("Время выполнения", 14);
         plt.YLabel("Процесс выполнения", 14);
         plt.Axes.AutoScale();
